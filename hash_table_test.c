@@ -13,20 +13,23 @@ int main()
         size_t offset2  = 512;
         void * ptr20    = (void *)0xBABE;
 
-        hash_table_t *my_hash_table = NULL;
+        hash_table_t * my_hash_table = NULL;
 
         ret = hash_table_construct(&my_hash_table, 10);
         printf("Construct: ret = %d\n", ret);
 
+//        hash_table_add(my_hash_table, &offset1, sizeof(size_t), &ptr10, sizeof(void *));
+//        hash_table_add(my_hash_table, &offset2, sizeof(size_t), &ptr20, sizeof(void *));
+//        hash_table_add(my_hash_table, &offset1, sizeof(size_t), &ptr10, sizeof(void *));
+//        hash_table_add(my_hash_table, &offset10,sizeof(size_t), &ptr11, sizeof(void *));
+//        hash_table_add(my_hash_table, &offset1, sizeof(size_t), &ptr10, sizeof(void *));
+
         HASH_TABLE_ADD(my_hash_table, &offset1, &ptr10);
-        hash_table_print(my_hash_table);
         HASH_TABLE_ADD(my_hash_table, &offset2, &ptr20);
-        hash_table_print(my_hash_table);
         HASH_TABLE_ADD(my_hash_table, &offset1, &ptr10);
-        hash_table_print(my_hash_table);
         HASH_TABLE_ADD(my_hash_table, &offset10, &ptr11);
-        hash_table_print(my_hash_table);
         HASH_TABLE_ADD(my_hash_table, &offset1, &ptr10);
+
         hash_table_print(my_hash_table);
 
         ret = hash_table_destruct(&my_hash_table);

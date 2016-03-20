@@ -35,6 +35,8 @@ struct hash_table
 
 size_t _hash(hash_table_t * hash_table, void * key, size_t key_s);
 
+//
+
 ret_code_t hash_table_construct(hash_table_t ** hash_table_ptr, size_t size)
         {
         if (!hash_table_ptr || size <= 0)
@@ -42,7 +44,7 @@ ret_code_t hash_table_construct(hash_table_t ** hash_table_ptr, size_t size)
                 return WRONG_ARGUMENTS;
                 }
 
-        hash_table_t * new_hash_table = (hash_table_t *)calloc(1, sizeof(hash_table_t *));
+        hash_table_t * new_hash_table = (hash_table_t *)calloc(1, sizeof(hash_table_t));
         if (!new_hash_table)
                 {
                 DEBUG_LOG_ARGS("failed to allocate memory for new hash_table. Reason: %s", strerror(errno));
@@ -231,7 +233,6 @@ ret_code_t hash_table_add(hash_table_t * hash_table, void * key, size_t key_s, v
 
 void hash_table_print(hash_table_t * hash_table)
         {
-        printf("size: %d\n", hash_table->size);
         int i = 0;
         for (i = 0; i < hash_table->size; i++)
                 {
@@ -249,6 +250,11 @@ void hash_table_print(hash_table_t * hash_table)
 
 size_t _hash(hash_table_t * hash_table, void * key_ptr, size_t key_s) // Implement this function for your data type
         {
+        if (hash_table->size == 0)
+                {
+                printf("ZERO, BITCH!\n");
+                return 0;
+                }
         size_t key = *(size_t *)key_ptr;
         return (size_t)(key % hash_table->size);
         }

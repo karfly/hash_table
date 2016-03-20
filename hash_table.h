@@ -7,9 +7,6 @@
 
 #define DEBUG
 
-#define HASH_LEN table->key_num
-#define HASH(x,y) hash_table_do_hash(x,y,HASH_LEN)
-
 typedef struct hash_table_elem hash_table_elem_t;
 typedef struct hash_table      hash_table_t;
 
