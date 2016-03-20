@@ -23,7 +23,7 @@ ret_code_t hash_table_remove(hash_table_t * hash_table, void * key, size_t key_s
 #define HASH_TABLE_REMOVE(hash_table, key) hash_table_remove(hash_table, key, sizeof(key));
 
 // Debug functions
-void hash_table_print(hash_table_t * hash_table);
+void hash_table_print(hash_table_t * hash_table); // Implemented for void pointers
 
 #endif // HASH_TABLE_H
 

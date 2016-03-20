@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "hash_table.h"
 
 int main()
@@ -31,13 +30,15 @@ int main()
 
         hash_table_print(my_hash_table);
 
-        HASH_TABLE_GET(my_hash_table, &offset1, &temp);
+        //HASH_TABLE_REMOVE(my_hash_table, &offset1);
 
-        printf("GET: %p\n", *(void **)temp);
+        ret = HASH_TABLE_GET(my_hash_table, &offset1, &temp);
+        printf("Get: ret = %d\n", ret);
+        if (temp)
+                printf("GET: value = %p\n",*(void **)temp);
 
         hash_table_print(my_hash_table);
 
-        HASH_TABLE_REMOVE(my_hash_table, &offset1);
         HASH_TABLE_REMOVE(my_hash_table, &offset1);
         HASH_TABLE_REMOVE(my_hash_table, &offset10);
         HASH_TABLE_REMOVE(my_hash_table, &offset2);
