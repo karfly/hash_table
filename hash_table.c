@@ -12,6 +12,9 @@
                                         free(elem);        elem         = NULL; \
                                         } while (0);                            \
 
+#define HASH_TABLE_ACT_ADD 0
+#define HASH_TABLE_ACT_DEL 1
+
 struct hash_table_elem
         {
         size_t key_s;
@@ -34,6 +37,7 @@ struct hash_table
 // Internal functions >>>
 
 size_t _hash(hash_table_t * hash_table, void * key, size_t key_s);
+ret_code_t _hash_table_find_in_list_and_act(hash_table_t * hash_table, size_t hash, hash_table_elem_t * new_elem, void * key, size_t key_s, int action);
 
 //
 
@@ -102,15 +106,15 @@ ret_code_t hash_table_destruct(hash_table_t ** hash_table_ptr)
         return SUCCESS;
         }
 
-ret_code_t hash_table_add(hash_table_t * hash_table, void * key, size_t key_s, void * value, size_t value_s)
+ret_code_t hash_table_put(hash_table_t * hash_table, void * key, size_t key_s, void * value, size_t value_s)
         {
         if (!hash_table || !key || !value || key_s <= 0 || value_s <= 0)
                 {
                 return WRONG_ARGUMENTS;
                 }
 
-        int    ret     = 0;
-        void * ret_ptr = NULL;
+        ret_code_t    ret     = 0;
+        void *        ret_ptr = NULL;
 
         hash_table_elem_t * new_elem = (hash_table_elem_t *)calloc(1, sizeof(hash_table_elem_t));
         if (!new_elem)
@@ -167,48 +171,12 @@ ret_code_t hash_table_add(hash_table_t * hash_table, void * key, size_t key_s, v
                 return SUCCESS;
                 }
 
-        hash_table_elem_t * temp_elem      = hash_table->entry[hash];
-        hash_table_elem_t * temp_prev_elem = NULL;
-        while(temp_elem)
+        ret = _hash_table_find_in_list_and_act(hash_table, hash, new_elem, key, key_s, HASH_TABLE_ACT_ADD);
+
+        if (!ret)
                 {
-                while (temp_elem && (temp_elem->key_s != key_s))
-                        {
-                        temp_prev_elem = temp_elem;
-                        temp_elem = temp_elem->next;
-                        }
-
-                if (temp_elem)
-                        {
-                        if (!memcmp(temp_elem->key, key, key_s))
-                                {
-                                hash_table_elem_t * to_delete_elem = temp_elem;
-
-                                if (!temp_prev_elem)
-                                        {
-                                        hash_table->entry[hash] = new_elem;
-                                        }
-                                else
-                                        {
-                                        temp_prev_elem->next = new_elem;
-                                        }
-                                new_elem->next  = to_delete_elem->next;
-
-                                _HASH_TABLE_FREE_ELEM(to_delete_elem);
-
-                                return SUCCESS;
-                                }
-                        else
-                                {
-                                temp_prev_elem = temp_elem;
-                                temp_elem = temp_elem->next;
-                                }
-                        }
+                return SUCCESS;
                 }
-
-        temp_prev_elem->next = new_elem;
-        hash_table->count++;
-
-        return SUCCESS;
 
         error_invalid_hash:
 
@@ -231,6 +199,37 @@ ret_code_t hash_table_add(hash_table_t * hash_table, void * key, size_t key_s, v
         return ERROR;
         }
 
+ret_code_t hash_table_remove(hash_table_t * hash_table, void * key, size_t key_s)
+        {
+        if (!hash_table || !key || key_s <= 0)
+                {
+                return WRONG_ARGUMENTS;
+                }
+
+        size_t hash = _hash(hash_table, key, key_s);
+        if (hash >= hash_table->size)
+                {
+                DEBUG_LOG_ARGS("invalid hash: %zu", hash);
+                return ERROR;
+                }
+
+        if (!hash_table->entry[hash])
+                {
+                DEBUG_LOG("element with such key was not found");
+                return ERROR;
+                }
+
+        ret_code_t ret = 0;
+        ret = _hash_table_find_in_list_and_act(hash_table, hash, NULL, key, key_s, HASH_TABLE_ACT_DEL);
+        if (!ret)
+                {
+                return SUCCESS;
+                }
+
+        DEBUG_LOG("element with such key was not found");
+        return ERROR;
+        }
+
 void hash_table_print(hash_table_t * hash_table)
         {
         int i = 0;
@@ -250,11 +249,77 @@ void hash_table_print(hash_table_t * hash_table)
 
 size_t _hash(hash_table_t * hash_table, void * key_ptr, size_t key_s) // Implement this function for your data type
         {
-        if (hash_table->size == 0)
-                {
-                printf("ZERO, BITCH!\n");
-                return 0;
-                }
         size_t key = *(size_t *)key_ptr;
         return (size_t)(key % hash_table->size);
+        }
+
+ret_code_t _hash_table_find_in_list_and_act(hash_table_t * hash_table, size_t hash, hash_table_elem_t * new_elem, void * key, size_t key_s, int action)
+        {
+        hash_table_elem_t * temp_elem = hash_table->entry[hash];
+        hash_table_elem_t * temp_prev_elem = NULL;
+        while (temp_elem)
+                {
+                while (temp_elem && (temp_elem->key_s != key_s))
+                        {
+                        temp_prev_elem = temp_elem;
+                        temp_elem = temp_elem->next;
+                        }
+
+                if (temp_elem)
+                        {
+                        if (!memcmp(temp_elem->key, key, key_s))
+                                {
+                                hash_table_elem_t * to_delete_elem = temp_elem;
+
+                                if (!temp_prev_elem)
+                                        {
+                                        if (action == HASH_TABLE_ACT_ADD)
+                                                {
+                                                hash_table->entry[hash] = new_elem;
+                                                }
+                                        else
+                                                {
+                                                hash_table->entry[hash] = temp_elem->next;
+                                                }
+                                        }
+                                else
+                                        {
+                                        if (action == HASH_TABLE_ACT_ADD)
+                                                {
+                                                temp_prev_elem->next = new_elem;
+                                                }
+                                        else
+                                                {
+                                                temp_prev_elem->next = temp_elem->next;
+                                                }
+                                        }
+
+                                if (action == HASH_TABLE_ACT_ADD)
+                                        {
+                                        new_elem->next = to_delete_elem->next;
+                                        }
+
+                                _HASH_TABLE_FREE_ELEM(to_delete_elem);
+
+                                if (action == HASH_TABLE_ACT_DEL)
+                                        {
+                                        hash_table->count--;
+                                        }
+
+                                return SUCCESS;
+                                }
+                        else
+                                {
+                                temp_prev_elem = temp_elem;
+                                temp_elem = temp_elem->next;
+                                }
+                        }
+                }
+        if (action == HASH_TABLE_ACT_ADD)
+                {
+                temp_prev_elem->next = new_elem;
+                hash_table->count++;
+                }
+
+        return SUCCESS;
         }
