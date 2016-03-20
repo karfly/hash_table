@@ -16,8 +16,11 @@ ret_code_t hash_table_destruct (hash_table_t ** hash_table_ptr);
 ret_code_t hash_table_put(hash_table_t * hash_table, void * key, size_t key_s, void * value, size_t value_s);
 #define HASH_TABLE_ADD(hash_table, key, value) hash_table_put(hash_table, key, sizeof(key), value, sizeof(value))
 
+ret_code_t hash_table_get(hash_table_t * hash_table, void * key, size_t key_s, void ** value_ptr, size_t value_s);
+#define HASH_TABLE_GET(hash_table, key, value_ptr) hash_table_get(hash_table, key, sizeof(key), value_ptr, sizeof(*value_ptr));
+
 ret_code_t hash_table_remove(hash_table_t * hash_table, void * key, size_t key_s);
-#define HASH_TABLE_REMOVE(hash_table, key) hash_table_remove(hash_table, key, sizeof(key))
+#define HASH_TABLE_REMOVE(hash_table, key) hash_table_remove(hash_table, key, sizeof(key));
 
 // Debug functions
 void hash_table_print(hash_table_t * hash_table);

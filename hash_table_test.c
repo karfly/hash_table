@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "hash_table.h"
 
 int main()
@@ -15,6 +16,8 @@ int main()
 
         size_t offset3  = 1024;
 
+        void * temp = NULL;
+
         hash_table_t * my_hash_table = NULL;
 
         ret = hash_table_construct(&my_hash_table, 5);
@@ -25,6 +28,12 @@ int main()
         HASH_TABLE_ADD(my_hash_table, &offset1,  &ptr10);
         HASH_TABLE_ADD(my_hash_table, &offset10, &ptr11);
         HASH_TABLE_ADD(my_hash_table, &offset1,  &ptr10);
+
+        hash_table_print(my_hash_table);
+
+        HASH_TABLE_GET(my_hash_table, &offset1, &temp);
+
+        printf("GET: %p\n", *(void **)temp);
 
         hash_table_print(my_hash_table);
 

@@ -199,6 +199,54 @@ ret_code_t hash_table_put(hash_table_t * hash_table, void * key, size_t key_s, v
         return ERROR;
         }
 
+ret_code_t hash_table_get(hash_table_t * hash_table, void * key, size_t key_s, void ** value_ptr, size_t value_s)
+        {
+        if (!hash_table || !key || key_s <= 0 || !value_ptr || value_s <= 0)
+                {
+                return WRONG_ARGUMENTS;
+                }
+
+        size_t hash = _hash(hash_table, key, key_s);
+        if (hash >= hash_table->size)
+                {
+                DEBUG_LOG_ARGS("invalid hash: %zu", hash);
+                return ERROR;
+                }
+
+        if (!hash_table->entry[hash])
+                {
+                DEBUG_LOG("element with such key was not found");
+                return ERROR;
+                }
+
+        hash_table_elem_t * temp_elem = hash_table->entry[hash];
+        while (temp_elem)
+                {
+                while (temp_elem && (temp_elem->key_s != key_s))
+                        {
+                        temp_elem = temp_elem->next;
+                        }
+
+                if (temp_elem)
+                        {
+                        if (!memcmp(temp_elem->key, key, key_s))
+                                {
+
+                                memcpy(value_ptr, &temp_elem->value, value_s);
+
+                                return SUCCESS;
+                                }
+                        else
+                                {
+                                temp_elem = temp_elem->next;
+                                }
+                        }
+                }
+
+        return ERROR;
+        }
+
+
 ret_code_t hash_table_remove(hash_table_t * hash_table, void * key, size_t key_s)
         {
         if (!hash_table || !key || key_s <= 0)
