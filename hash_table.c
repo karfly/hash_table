@@ -169,7 +169,7 @@ ret_code_t hash_table_add(hash_table_t * hash_table, void * key, size_t key_s, v
         hash_table_elem_t * temp_prev_elem = NULL;
         while(temp_elem)
                 {
-                while (temp_elem && temp_elem->key_s != key_s)
+                while (temp_elem && (temp_elem->key_s != key_s))
                         {
                         temp_prev_elem = temp_elem;
                         temp_elem = temp_elem->next;
@@ -231,6 +231,7 @@ ret_code_t hash_table_add(hash_table_t * hash_table, void * key, size_t key_s, v
 
 void hash_table_print(hash_table_t * hash_table)
         {
+        printf("size: %d\n", hash_table->size);
         int i = 0;
         for (i = 0; i < hash_table->size; i++)
                 {
@@ -239,7 +240,7 @@ void hash_table_print(hash_table_t * hash_table)
                 hash_table_elem_t * temp_elem = hash_table->entry[i];
                 while(temp_elem)
                         {
-                        printf("(%d, %s) ", *(int *)temp_elem->key, *(char **)temp_elem->value);
+                        printf("(%zu, %p) ", *(size_t *)temp_elem->key, *(void **)temp_elem->value);
                         temp_elem = temp_elem->next;
                         }
                 printf("\n");
@@ -248,6 +249,6 @@ void hash_table_print(hash_table_t * hash_table)
 
 size_t _hash(hash_table_t * hash_table, void * key_ptr, size_t key_s) // Implement this function for your data type
         {
-        int key = *(int *)key_ptr;
-        return (key % hash_table->size);
+        size_t key = *(size_t *)key_ptr;
+        return (size_t)(key % hash_table->size);
         }
