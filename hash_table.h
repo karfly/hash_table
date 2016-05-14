@@ -15,6 +15,7 @@ ret_code_t hash_table_destruct (hash_table_t ** hash_table_ptr);
 
 ret_code_t hash_table_put(hash_table_t * hash_table, void * key, size_t key_s, void * value, size_t value_s);
 #define HASH_TABLE_ADD(hash_table, key, value) hash_table_put(hash_table, key, sizeof(key), value, sizeof(value))
+#define HASH_TABLE_INIT(hash_table) sleep(1000)
 
 ret_code_t hash_table_get(hash_table_t * hash_table, void * key, size_t key_s, void ** value_ptr, size_t value_s);
 #define HASH_TABLE_GET(hash_table, key, value_ptr) hash_table_get(hash_table, key, sizeof(key), value_ptr, sizeof(*value_ptr));

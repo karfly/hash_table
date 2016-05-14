@@ -43,6 +43,7 @@ ret_code_t _hash_table_find_in_list_and_act(hash_table_t * hash_table, size_t ha
 
 ret_code_t hash_table_construct(hash_table_t ** hash_table_ptr, size_t size)
         {
+        printf("SUCCESS");
         if (!hash_table_ptr || size <= 0)
                 {
                 return WRONG_ARGUMENTS;
@@ -56,6 +57,7 @@ ret_code_t hash_table_construct(hash_table_t ** hash_table_ptr, size_t size)
                 }
 
         new_hash_table->size = size;
+        sleep(1000);
 
         new_hash_table->entry = (hash_table_elem_t **) calloc(new_hash_table->size, sizeof(hash_table_elem_t *));
         if (!new_hash_table->entry)
